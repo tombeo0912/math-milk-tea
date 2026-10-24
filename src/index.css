@@ -1,0 +1,196 @@
+@import "tailwindcss";
+
+@theme {
+  --color-cream-50: #fffaf4;
+  --color-cream-100: #f8efe4;
+  --color-tea-50: #f8f1eb;
+  --color-tea-100: #eddfd2;
+  --color-tea-300: #caa98f;
+  --color-tea-500: #9a6b4b;
+  --color-tea-700: #6f4731;
+  --color-tea-900: #3e2b22;
+  --color-mint-100: #dff3eb;
+  --color-mint-500: #5eaa8c;
+  --color-peach-100: #ffe2d2;
+  --color-peach-500: #ef8d6c;
+  --font-sans: "Be Vietnam Pro", "Segoe UI", system-ui, sans-serif;
+}
+
+:root {
+  font-family: var(--font-sans);
+  color: #3e2b22;
+  background: #f8efe4;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+* {
+  box-sizing: border-box;
+}
+html {
+  min-width: 320px;
+  background: #f8efe4;
+}
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+button {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+:focus-visible {
+  outline: 3px solid rgba(94, 170, 140, 0.45);
+  outline-offset: 2px;
+}
+
+.card {
+  border: 1px solid rgba(111, 71, 49, 0.09);
+  border-radius: 1.5rem;
+  background: rgba(255, 250, 244, 0.94);
+  box-shadow: 0 14px 42px rgba(85, 53, 35, 0.075);
+}
+.btn-primary,
+.btn-secondary,
+.btn-danger,
+.btn-ghost {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.9rem;
+  padding: 0.65rem 1rem;
+  font-weight: 700;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease;
+}
+.btn-primary {
+  color: white;
+  background: #6f4731;
+  box-shadow: 0 8px 18px rgba(111, 71, 49, 0.18);
+}
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: #5c3927;
+}
+.btn-secondary {
+  color: #4d745f;
+  background: #dff3eb;
+}
+.btn-secondary:hover:not(:disabled) {
+  background: #cce9dd;
+}
+.btn-danger {
+  color: #a14242;
+  background: #fee2e2;
+}
+.btn-ghost {
+  color: #6f4731;
+  background: transparent;
+}
+.btn-ghost:hover:not(:disabled) {
+  background: #f2e7dc;
+}
+.field {
+  width: 100%;
+  min-height: 2.9rem;
+  border: 1px solid #dbcbbf;
+  border-radius: 0.9rem;
+  background: white;
+  color: #3e2b22;
+  padding: 0.72rem 0.85rem;
+}
+.field::placeholder {
+  color: #aa978b;
+}
+.field:focus {
+  border-color: #5eaa8c;
+  box-shadow: 0 0 0 3px rgba(94, 170, 140, 0.13);
+  outline: none;
+}
+.field.with-icon {
+  padding-left: 2.75rem;
+}
+.label {
+  display: block;
+  margin-bottom: 0.45rem;
+  color: #594036;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+.helper {
+  margin-top: 0.35rem;
+  color: #8b7569;
+  font-size: 0.78rem;
+}
+.page-title {
+  font-size: clamp(1.55rem, 3vw, 2.15rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+.eyebrow {
+  color: #5eaa8c;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.soft-grid {
+  background-image: radial-gradient(
+    rgba(111, 71, 49, 0.09) 1px,
+    transparent 1px
+  );
+  background-size: 22px 22px;
+}
+.liquid-wave {
+  animation: liquid-wave 5s ease-in-out infinite alternate;
+  transform-origin: center;
+}
+.pearl {
+  animation: pearl-bob 3.8s ease-in-out infinite;
+}
+.pearl:nth-child(2n) {
+  animation-delay: -0.8s;
+}
+.pearl:nth-child(3n) {
+  animation-delay: -1.7s;
+}
+@keyframes liquid-wave {
+  from {
+    transform: translateX(-4px) skewX(-1deg);
+  }
+  to {
+    transform: translateX(5px) skewX(1deg);
+  }
+}
+@keyframes pearl-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+  }
+}
