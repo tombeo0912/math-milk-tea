@@ -13,14 +13,14 @@ interface ResultRow {
   id: string;
   submitted_at: string;
   assignment: { title: string };
-  grading_records: Array<{
+  grading_record: {
     math_score: number;
     difficulty_label_snapshot: string;
     approved_points: number;
     comment: string | null;
     status: string;
     approved_at: string | null;
-  }>;
+  } | null;
 }
 
 export function StudentResults() {
@@ -30,7 +30,7 @@ export function StudentResults() {
       db
         .from("submissions")
         .select(
-          "id, submitted_at, assignment:assignments(title), grading_records(*)",
+          "id, submitted_at, assignment:assignments(title), grading_record:grading_records(*)",
         )
         .order("submitted_at", { ascending: false }),
       db
@@ -50,7 +50,7 @@ export function StudentResults() {
   if (state.error || !state.data)
     return <ErrorState message={state.error ?? "Không thể tải kết quả."} />;
   const approved = state.data.results.filter((item) =>
-    item.grading_records.some((grade) => grade.status === "approved"),
+    item.grading_record?.status === "approved",
   );
   return (
     <div>
@@ -71,9 +71,7 @@ export function StudentResults() {
             />
           ) : (
             approved.map((item) => {
-              const grade = item.grading_records.find(
-                (value) => value.status === "approved",
-              )!;
+              const grade = item.grading_record!;
               return (
                 <article key={item.id} className="card p-5 md:p-6">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">

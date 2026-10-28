@@ -31,14 +31,14 @@ type Review = Submission & {
   assignment: { title: string };
   profiles: { display_name: string };
   submission_files: SubmissionFile[];
-  grading_records: Array<{
+  grading_record: {
     math_score: number;
     difficulty_code: string;
     approved_points: number;
     comment: string | null;
     adjustment_reason: string | null;
     status: string;
-  }>;
+  } | null;
 };
 export function TeacherGrading() {
   const [selected, setSelected] = useState<Review | null>(null);
@@ -56,7 +56,7 @@ export function TeacherGrading() {
       db
         .from("submissions")
         .select(
-          "*, assignment:assignments(title), profiles(display_name), submission_files(*), grading_records(*)",
+          "*, assignment:assignments(title), profiles(display_name), submission_files(*), grading_record:grading_records(*)",
         )
         .order("submitted_at", { ascending: true }),
       db
@@ -88,9 +88,10 @@ export function TeacherGrading() {
             .then((result) => result.data?.signedUrl ?? ""),
         ),
     ).then(setUrls);
-    const draft = selected.grading_records.find(
-      (value) => value.status === "draft",
-    );
+    const draft =
+      selected.grading_record?.status === "draft"
+        ? selected.grading_record
+        : null;
     setScore(draft ? String(draft.math_score) : "");
     setDifficulty(draft?.difficulty_code ?? "");
     setApproved(draft ? String(draft.approved_points) : "0");
@@ -176,10 +177,10 @@ export function TeacherGrading() {
   if (state.error || !state.data)
     return <ErrorState message={state.error ?? "Không thể tải bài nộp."} />;
   const pending = state.data.submissions.filter(
-    (item) => !item.grading_records.some((g) => g.status === "approved"),
+    (item) => item.grading_record?.status !== "approved",
   );
   const approvedRows = state.data.submissions.filter((item) =>
-    item.grading_records.some((g) => g.status === "approved"),
+    item.grading_record?.status === "approved",
   );
   return (
     <div>
