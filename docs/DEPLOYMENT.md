@@ -91,6 +91,6 @@ Kiểm tra hành trình thật bằng hai cửa sổ trình duyệt riêng:
 6. Lấy URL `https://...pages.dev`, cập nhật Supabase Auth:
    - Site URL: URL production.
    - Redirect URL: `https://...pages.dev/dat-lai-mat-khau`.
-7. Deploy lại và kiểm tra HTTPS, login, upload ảnh, chấm/duyệt, đổi quà.
+7. Deploy lại và kiểm tra HTTPS, login, upload ảnh/PDF, chấm/duyệt, đổi quà.
 
 Không cần mua domain ở giai đoạn đầu. Không tuyên bố production hoàn tất trước khi toàn bộ hành trình trên chạy với dữ liệu thật.

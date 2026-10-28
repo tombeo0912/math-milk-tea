@@ -1,6 +1,8 @@
 import {
   CheckCircle2,
   Eye,
+  ExternalLink,
+  FileText,
   LoaderCircle,
   Save,
   ZoomIn,
@@ -40,9 +42,10 @@ type Review = Submission & {
     status: string;
   } | null;
 };
+type SignedSubmissionFile = SubmissionFile & { signedUrl: string };
 export function TeacherGrading() {
   const [selected, setSelected] = useState<Review | null>(null);
-  const [urls, setUrls] = useState<string[]>([]);
+  const [signedFiles, setSignedFiles] = useState<SignedSubmissionFile[]>([]);
   const [zoom, setZoom] = useState(1);
   const [score, setScore] = useState("");
   const [difficulty, setDifficulty] = useState("");
@@ -74,20 +77,20 @@ export function TeacherGrading() {
   }, []);
   useEffect(() => {
     if (!selected) {
-      setUrls([]);
+      setSignedFiles([]);
       return;
     }
     const db = requireSupabase();
     void Promise.all(
-      selected.submission_files
+      [...selected.submission_files]
         .sort((a, b) => a.page_order - b.page_order)
-        .map((file) =>
-          db.storage
+        .map(async (file) => {
+          const result = await db.storage
             .from("submission-images")
-            .createSignedUrl(file.storage_path, 900)
-            .then((result) => result.data?.signedUrl ?? ""),
-        ),
-    ).then(setUrls);
+            .createSignedUrl(file.storage_path, 900);
+          return { ...file, signedUrl: result.data?.signedUrl ?? "" };
+        }),
+    ).then(setSignedFiles);
     const draft =
       selected.grading_record?.status === "draft"
         ? selected.grading_record
@@ -179,8 +182,8 @@ export function TeacherGrading() {
   const pending = state.data.submissions.filter(
     (item) => item.grading_record?.status !== "approved",
   );
-  const approvedRows = state.data.submissions.filter((item) =>
-    item.grading_record?.status === "approved",
+  const approvedRows = state.data.submissions.filter(
+    (item) => item.grading_record?.status === "approved",
   );
   return (
     <div>
@@ -264,33 +267,64 @@ export function TeacherGrading() {
               <div className="mb-3 flex items-center justify-between text-white">
                 <strong>
                   {selected.assignment.title} ·{" "}
-                  {selected.submission_files.length} trang
+                  {selected.submission_files.length} tệp
                 </strong>
-                <div className="flex gap-2">
-                  <button
-                    className="rounded-xl bg-white/10 p-2"
-                    onClick={() => setZoom((v) => Math.max(0.6, v - 0.2))}
-                  >
-                    <ZoomOut />
-                  </button>
-                  <button
-                    className="rounded-xl bg-white/10 p-2"
-                    onClick={() => setZoom((v) => Math.min(2.2, v + 0.2))}
-                  >
-                    <ZoomIn />
-                  </button>
-                </div>
+                {selected.submission_files.some((file) =>
+                  file.mime_type.startsWith("image/"),
+                ) && (
+                  <div className="flex gap-2">
+                    <button
+                      className="rounded-xl bg-white/10 p-2"
+                      onClick={() => setZoom((v) => Math.max(0.6, v - 0.2))}
+                    >
+                      <ZoomOut />
+                    </button>
+                    <button
+                      className="rounded-xl bg-white/10 p-2"
+                      onClick={() => setZoom((v) => Math.min(2.2, v + 0.2))}
+                    >
+                      <ZoomIn />
+                    </button>
+                  </div>
+                )}
               </div>
               <div className="max-h-[calc(100vh-8rem)] space-y-4 overflow-auto rounded-2xl bg-white/10 p-3">
-                {urls.map((url, index) => (
-                  <img
-                    key={url}
-                    src={url}
-                    alt={`Trang bài làm ${index + 1}`}
-                    className="mx-auto origin-top rounded-xl bg-white shadow-xl transition-transform"
-                    style={{ width: `${zoom * 100}%`, maxWidth: "none" }}
-                  />
-                ))}
+                {signedFiles.map((file, index) =>
+                  file.mime_type === "application/pdf" ? (
+                    <div
+                      key={file.storage_path}
+                      className="overflow-hidden rounded-xl bg-white"
+                    >
+                      <div className="flex items-center justify-between gap-3 p-3 text-tea-900">
+                        <span className="flex items-center gap-2 font-bold">
+                          <FileText className="text-peach-500" /> PDF{" "}
+                          {index + 1}
+                        </span>
+                        <a
+                          className="btn-secondary"
+                          href={file.signedUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          <ExternalLink size={17} /> Mở PDF
+                        </a>
+                      </div>
+                      <iframe
+                        className="h-[70vh] w-full border-t border-tea-100"
+                        src={file.signedUrl}
+                        title={`Tệp PDF bài làm ${index + 1}`}
+                      />
+                    </div>
+                  ) : (
+                    <img
+                      key={file.storage_path}
+                      src={file.signedUrl}
+                      alt={`Trang bài làm ${index + 1}`}
+                      className="mx-auto origin-top rounded-xl bg-white shadow-xl transition-transform"
+                      style={{ width: `${zoom * 100}%`, maxWidth: "none" }}
+                    />
+                  ),
+                )}
               </div>
             </section>
             <section className="card h-fit bg-cream-50 p-5 md:p-7">

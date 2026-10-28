@@ -16,8 +16,8 @@ Website học Toán cho một giáo viên và một học sinh: giao bài, nộp
 
 - Đăng nhập bằng tài khoản được cấp, không có đăng ký công khai.
 - Xem bài đã đăng và hạn nộp.
-- Kéo thả tối đa 10 ảnh, xem trước, xoay, đổi thứ tự và xóa trước khi nộp.
-- Ảnh được thu nhỏ an toàn, chuyển WebP, bỏ EXIF và tải vào private bucket.
+- Kéo thả tối đa 10 tệp ảnh/PDF, xem trước, đổi thứ tự và xóa trước khi nộp; ảnh có thể xoay.
+- Ảnh được thu nhỏ an toàn, chuyển WebP và bỏ EXIF; PDF được giữ nguyên trong private bucket.
 - Xem kết quả, nhận xét và lịch sử điểm.
 - Theo dõi cốc trà sữa SVG theo đúng giá quà mục tiêu.
 - Chọn một món quà mục tiêu; nếu đủ điểm, RPC tự đổi ngay và giữ điểm dư.
@@ -25,7 +25,7 @@ Website học Toán cho một giáo viên và một học sinh: giao bài, nộp
 
 ### Giáo viên
 
-- Tạo, sửa, đăng, đóng nhận bài và lưu trữ bài tập; có ảnh đề tùy chọn.
+- Tạo, sửa, đăng, đóng nhận bài và lưu trữ bài tập; có thể đính kèm ảnh hoặc PDF đề bài.
 - Xem ảnh bài làm bằng signed URL, phóng to và chấm theo thang 10.
 - Chọn độ khó khi chấm; xem điểm đề xuất; điều chỉnh có lý do.
 - Lưu nháp không cộng điểm; duyệt mới ghi ledger và cộng điểm.

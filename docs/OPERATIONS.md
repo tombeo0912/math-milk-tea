@@ -5,7 +5,7 @@
 ### Thêm bài tập
 
 1. Vào **Quản lý bài tập** → **Tạo bài mới**.
-2. Nhập tiêu đề, nội dung, hướng dẫn, hạn nộp và ảnh đề nếu có.
+2. Nhập tiêu đề, nội dung, hướng dẫn, hạn nộp và tệp đề ảnh/PDF nếu có.
 3. Chọn **Đã đăng** để học sinh nhìn thấy; bật/tắt **Cho phép học sinh nộp bài** để mở/đóng nhận bài.
 4. Độ khó chưa cần chọn ở bước này.
 
@@ -34,7 +34,7 @@ Trong **Điểm thưởng** → **Điều chỉnh bài đã duyệt**, nhập đ
 
 1. Đăng nhập bằng tài khoản giáo viên cấp.
 2. Mở **Bài tập của em**, làm bài trên giấy và chọn bài cần nộp.
-3. Chọn/kéo tối đa 10 ảnh; dùng nút xoay và mũi tên để xếp đúng trang.
+3. Chọn/kéo tối đa 10 tệp ảnh/PDF; dùng nút xoay cho ảnh và mũi tên để xếp đúng thứ tự.
 4. Bấm **Xác nhận nộp** và chờ thông báo thành công.
 5. Xem kết quả, nhận xét và lịch sử điểm trong **Kết quả học tập**.
 6. Chọn đúng một mục tiêu trong **Cửa hàng**. Nếu số dư đã đủ và quà còn hàng, transaction đổi quà chạy ngay.

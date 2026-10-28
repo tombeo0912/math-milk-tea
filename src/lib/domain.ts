@@ -67,15 +67,20 @@ export function encouragement(progress: number): string {
 
 export const MAX_SUBMISSION_FILES = 10;
 export const MAX_FILE_BYTES = 5 * 1024 * 1024;
+export const MAX_ORIGINAL_FILE_BYTES = 15 * 1024 * 1024;
 export const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+export const ACCEPTED_SUBMISSION_TYPES = [
+  ...ACCEPTED_IMAGE_TYPES,
+  "application/pdf",
+];
 
 export function validateSubmissionFile(
   file: Pick<File, "type" | "size">,
 ): string | null {
-  if (!ACCEPTED_IMAGE_TYPES.includes(file.type))
-    return "Chỉ chấp nhận ảnh JPEG, PNG hoặc WebP.";
-  if (file.size > 15 * 1024 * 1024)
-    return "Ảnh gốc quá lớn. Vui lòng chọn ảnh dưới 15 MB.";
+  if (!ACCEPTED_SUBMISSION_TYPES.includes(file.type))
+    return "Chỉ chấp nhận ảnh JPEG, PNG, WebP hoặc tệp PDF.";
+  if (file.size > MAX_ORIGINAL_FILE_BYTES)
+    return "Tệp quá lớn. Vui lòng chọn tệp dưới 15 MB.";
   return null;
 }
 

@@ -4,6 +4,7 @@ import {
   calculateSuggestedPoints,
   pointsRemaining,
   potentialRedemptions,
+  validateSubmissionFile,
 } from "./domain";
 
 describe("công thức điểm thưởng", () => {
@@ -43,5 +44,26 @@ describe("tiến độ và đổi quà", () => {
     expect(potentialRedemptions(450, 200, null)).toBe(2);
     expect(potentialRedemptions(450, 200, 1)).toBe(1);
     expect(potentialRedemptions(450, 200, 0)).toBe(0);
+  });
+});
+
+describe("tệp bài làm", () => {
+  it.each(["image/jpeg", "image/png", "image/webp", "application/pdf"])(
+    "chấp nhận %s",
+    (type) => {
+      expect(validateSubmissionFile({ type, size: 1024 })).toBeNull();
+    },
+  );
+
+  it("từ chối loại tệp không hỗ trợ và tệp trên 15 MB", () => {
+    expect(
+      validateSubmissionFile({ type: "application/zip", size: 1024 }),
+    ).toMatch(/JPEG/);
+    expect(
+      validateSubmissionFile({
+        type: "application/pdf",
+        size: 15 * 1024 * 1024 + 1,
+      }),
+    ).toMatch(/15 MB/);
   });
 });

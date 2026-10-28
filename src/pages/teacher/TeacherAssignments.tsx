@@ -9,7 +9,11 @@ import {
 } from "../../components/Feedback";
 import { useAuth } from "../../context/AuthContext";
 import { useAsyncData } from "../../hooks/useAsyncData";
-import { friendlyDate } from "../../lib/domain";
+import {
+  ACCEPTED_SUBMISSION_TYPES,
+  friendlyDate,
+  validateSubmissionFile,
+} from "../../lib/domain";
 import { processSubmissionImage } from "../../lib/images";
 import { requireSupabase } from "../../lib/supabase";
 import type { Assignment, AssignmentStatus } from "../../types/domain";
@@ -61,24 +65,32 @@ export function TeacherAssignments() {
     setBusy(true);
     const db = requireSupabase();
     const recordId = editing?.id ?? crypto.randomUUID();
+    const previousImagePath = editing?.image_path ?? null;
     let imagePath = editing?.image_path ?? null;
+    let uploadedPath: string | null = null;
     if (imageFile) {
       try {
-        const processed = await processSubmissionImage(imageFile, 0);
-        imagePath = `${user.id}/${recordId}/statement.webp`;
+        const validationError = validateSubmissionFile(imageFile);
+        if (validationError) throw new Error(validationError);
+        const isPdf = imageFile.type === "application/pdf";
+        const uploadFile = isPdf
+          ? imageFile
+          : await processSubmissionImage(imageFile, 0);
+        imagePath = `${user.id}/${recordId}/statement.${isPdf ? "pdf" : "webp"}`;
         const { error } = await db.storage
           .from("assignment-images")
-          .upload(imagePath, processed, {
-            contentType: "image/webp",
-            upsert: Boolean(editing),
+          .upload(imagePath, uploadFile, {
+            contentType: uploadFile.type,
+            upsert: imagePath === previousImagePath,
           });
         if (error) throw error;
+        uploadedPath = imagePath;
       } catch (reason) {
         setBusy(false);
         return toast.error(
           reason instanceof Error
             ? reason.message
-            : "Không thể tải ảnh đề bài.",
+            : "Không thể tải tệp đề bài.",
         );
       }
     }
@@ -96,7 +108,13 @@ export function TeacherAssignments() {
       ? await db.from("assignments").update(payload).eq("id", editing.id)
       : await db.from("assignments").insert({ id: recordId, ...payload });
     setBusy(false);
-    if (result.error) return toast.error(result.error.message);
+    if (result.error) {
+      if (uploadedPath && uploadedPath !== previousImagePath)
+        await db.storage.from("assignment-images").remove([uploadedPath]);
+      return toast.error(result.error.message);
+    }
+    if (previousImagePath && previousImagePath !== imagePath)
+      await db.storage.from("assignment-images").remove([previousImagePath]);
     toast.success(editing ? "Đã cập nhật bài tập." : "Đã tạo bài tập mới.");
     setOpen(false);
     void state.reload();
@@ -257,20 +275,20 @@ export function TeacherAssignments() {
                 />
               </label>
               <label>
-                <span className="label">Ảnh đề bài (tùy chọn)</span>
+                <span className="label">Tệp đề bài (tùy chọn)</span>
                 <input
                   className="field pt-2"
                   type="file"
-                  accept="image/jpeg,image/png,image/webp"
+                  accept={ACCEPTED_SUBMISSION_TYPES.join(",")}
                   onChange={(event) =>
                     setImageFile(event.target.files?.[0] ?? null)
                   }
                 />
                 <p className="helper">
-                  Ảnh được chuyển sang WebP, bỏ EXIF và lưu trong bucket riêng
-                  tư.
+                  Chấp nhận JPEG, PNG, WebP hoặc PDF tối đa 15 MB. Ảnh được
+                  chuyển sang WebP và bỏ EXIF; PDF được giữ nguyên.
                   {editing?.image_path && !imageFile
-                    ? " Ảnh hiện tại sẽ được giữ nguyên."
+                    ? " Tệp hiện tại sẽ được giữ nguyên."
                     : ""}
                 </p>
               </label>
