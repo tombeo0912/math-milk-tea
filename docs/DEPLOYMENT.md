@@ -18,10 +18,10 @@ npx supabase link --project-ref YOUR_PROJECT_REF
 npx supabase db push
 ```
 
-Nếu dùng SQL Editor, chạy ba tệp trong `supabase/migrations` đúng thứ tự tên. Sau đó kiểm tra:
+Nếu dùng SQL Editor, chạy toàn bộ tệp trong `supabase/migrations` đúng thứ tự tên. Sau đó kiểm tra:
 
-- 14 bảng trong schema `public`.
-- Ba bucket `submission-images`, `assignment-images`, `reward-images` đều là private.
+- 17 bảng trong schema `public`.
+- Bốn bucket `submission-images`, `assignment-images`, `reward-images`, `achievement-evidence` đều là private.
 - RLS đã bật trên mọi bảng public.
 - Role `anon` không có quyền trên bảng dữ liệu nghiệp vụ.
 - Authenticated client chỉ ghi điểm/đổi quà thông qua RPC được cấp quyền.
@@ -77,6 +77,8 @@ Kiểm tra hành trình thật bằng hai cửa sổ trình duyệt riêng:
 4. Học sinh thấy điểm và cốc cập nhật.
 5. Dùng một phần quà giá thấp trong staging để kiểm tra tự đổi, điểm dư và tồn kho.
 6. Giáo viên xác nhận đã trao.
+7. Học sinh gửi minh chứng điểm tốt; giáo viên duyệt và kiểm tra điểm chỉ cộng một lần.
+8. Học sinh gửi mong muốn quà; giáo viên tạo sản phẩm từ đề nghị và học sinh nhận thông báo.
 
 ## 5. Deploy Cloudflare Pages
 

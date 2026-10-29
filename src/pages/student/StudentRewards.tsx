@@ -14,6 +14,7 @@ import type {
   RewardProduct,
   RewardTarget,
 } from "../../types/domain";
+import { RewardWishPanel } from "./RewardWishPanel";
 
 export function StudentRewards() {
   const [busy, setBusy] = useState<string | null>(null);
@@ -84,6 +85,7 @@ export function StudentRewards() {
           chỉ có một mục tiêu đang hoạt động.
         </p>
       </header>
+      <RewardWishPanel />
       <div className="mt-7 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
         {data.products.map((product) => {
           const selected = data.target?.product_id === product.id;

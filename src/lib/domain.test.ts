@@ -4,6 +4,7 @@ import {
   calculateSuggestedPoints,
   pointsRemaining,
   potentialRedemptions,
+  validateReportedScore,
   validateSubmissionFile,
 } from "./domain";
 
@@ -65,5 +66,23 @@ describe("tệp bài làm", () => {
         size: 15 * 1024 * 1024 + 1,
       }),
     ).toMatch(/15 MB/);
+  });
+});
+
+describe("điểm số học sinh báo cáo", () => {
+  it.each([
+    [9, 10],
+    [8.5, 10],
+    [18, 20],
+    [85, 100],
+  ])("chấp nhận %s trên thang %s", (score, maxScore) => {
+    expect(validateReportedScore(score, maxScore)).toBeNull();
+  });
+
+  it("từ chối điểm âm, vượt thang và quá 2 chữ số thập phân", () => {
+    expect(validateReportedScore(-1, 10)).not.toBeNull();
+    expect(validateReportedScore(11, 10)).not.toBeNull();
+    expect(validateReportedScore(8.555, 10)).not.toBeNull();
+    expect(validateReportedScore(8, 0)).not.toBeNull();
   });
 });

@@ -6,12 +6,14 @@ import { useAuth } from "./context/AuthContext";
 import { LoginPage } from "./pages/LoginPage";
 import { ResetPasswordPage } from "./pages/ResetPasswordPage";
 import { AssignmentSubmissionPage } from "./pages/student/AssignmentSubmissionPage";
+import { StudentAchievements } from "./pages/student/StudentAchievements";
 import { StudentAssignments } from "./pages/student/StudentAssignments";
 import { StudentDashboard } from "./pages/student/StudentDashboard";
 import { StudentGifts } from "./pages/student/StudentGifts";
 import { StudentResults } from "./pages/student/StudentResults";
 import { StudentRewards } from "./pages/student/StudentRewards";
 import { TeacherAssignments } from "./pages/teacher/TeacherAssignments";
+import { TeacherAchievements } from "./pages/teacher/TeacherAchievements";
 import { TeacherDashboard } from "./pages/teacher/TeacherDashboard";
 import { TeacherGrading } from "./pages/teacher/TeacherGrading";
 import { TeacherPoints } from "./pages/teacher/TeacherPoints";
@@ -73,6 +75,7 @@ export default function App() {
           element={<AssignmentSubmissionPage />}
         />
         <Route path="/hoc-sinh/ket-qua" element={<StudentResults />} />
+        <Route path="/hoc-sinh/thanh-tich" element={<StudentAchievements />} />
         <Route path="/hoc-sinh/cua-hang" element={<StudentRewards />} />
         <Route path="/hoc-sinh/qua-cua-em" element={<StudentGifts />} />
       </Route>
@@ -86,6 +89,10 @@ export default function App() {
         <Route path="/giao-vien" element={<TeacherDashboard />} />
         <Route path="/giao-vien/bai-tap" element={<TeacherAssignments />} />
         <Route path="/giao-vien/cham-bai" element={<TeacherGrading />} />
+        <Route
+          path="/giao-vien/duyet-thanh-tich"
+          element={<TeacherAchievements />}
+        />
         <Route path="/giao-vien/diem-thuong" element={<TeacherPoints />} />
         <Route path="/giao-vien/cua-hang" element={<TeacherRewards />} />
         <Route path="/giao-vien/doi-qua" element={<TeacherRedemptions />} />

@@ -1,4 +1,5 @@
 import {
+  BadgeCheck,
   BookOpenCheck,
   ClipboardCheck,
   Coins,
@@ -6,6 +7,7 @@ import {
   Home,
   LogOut,
   Menu,
+  Medal,
   Settings,
   Store,
   Trophy,
@@ -21,6 +23,7 @@ const studentLinks = [
   { to: "/hoc-sinh", label: "Trang chủ", icon: Home, end: true },
   { to: "/hoc-sinh/bai-tap", label: "Bài tập của em", icon: BookOpenCheck },
   { to: "/hoc-sinh/ket-qua", label: "Kết quả học tập", icon: Trophy },
+  { to: "/hoc-sinh/thanh-tich", label: "Điểm ở trường", icon: Medal },
   { to: "/hoc-sinh/cua-hang", label: "Cửa hàng", icon: Store },
   { to: "/hoc-sinh/qua-cua-em", label: "Quà của em", icon: Gift },
 ];
@@ -28,6 +31,11 @@ const teacherLinks = [
   { to: "/giao-vien", label: "Tổng quan", icon: Home, end: true },
   { to: "/giao-vien/bai-tap", label: "Quản lý bài tập", icon: BookOpenCheck },
   { to: "/giao-vien/cham-bai", label: "Chấm bài", icon: ClipboardCheck },
+  {
+    to: "/giao-vien/duyet-thanh-tich",
+    label: "Duyệt thành tích",
+    icon: BadgeCheck,
+  },
   { to: "/giao-vien/diem-thuong", label: "Điểm thưởng", icon: Coins },
   { to: "/giao-vien/cua-hang", label: "Cửa hàng", icon: Store },
   { to: "/giao-vien/doi-qua", label: "Quà đã đổi", icon: Gift },
@@ -39,7 +47,7 @@ export function AppShell() {
   const [open, setOpen] = useState(false);
   const links = profile?.role === "teacher" ? teacherLinks : studentLinks;
   const sidebar = (
-    <aside className="flex h-full flex-col bg-tea-900 px-4 py-5 text-white">
+    <aside className="flex h-full flex-col overflow-y-auto bg-tea-900 px-4 py-5 text-white">
       <div className="flex items-center justify-between px-2">
         <NavLink
           to={profile?.role === "teacher" ? "/giao-vien" : "/hoc-sinh"}

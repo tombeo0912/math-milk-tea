@@ -87,11 +87,15 @@ export function NotificationCenter() {
                 >
                   <div className="flex gap-3">
                     <span className="text-xl">
-                      {item.kind.includes("reward")
-                        ? "🎁"
-                        : item.kind.includes("point")
-                          ? "⭐"
-                          : "📝"}
+                      {item.kind.includes("achievement")
+                        ? "🏅"
+                        : item.kind.includes("wish")
+                          ? "💭"
+                          : item.kind.includes("reward")
+                            ? "🎁"
+                            : item.kind.includes("point")
+                              ? "⭐"
+                              : "📝"}
                     </span>
                     <div>
                       <h3 className="text-sm font-extrabold">{item.title}</h3>

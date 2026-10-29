@@ -84,6 +84,23 @@ export function validateSubmissionFile(
   return null;
 }
 
+export function validateReportedScore(
+  score: number,
+  maxScore: number,
+): string | null {
+  if (!Number.isFinite(score) || !Number.isFinite(maxScore))
+    return "Điểm và thang điểm phải là số hợp lệ.";
+  if (maxScore <= 0 || maxScore > 100000) return "Thang điểm phải lớn hơn 0.";
+  if (score < 0 || score > maxScore)
+    return "Điểm phải từ 0 đến thang điểm tối đa.";
+  if (
+    Math.round(score * 100) / 100 !== score ||
+    Math.round(maxScore * 100) / 100 !== maxScore
+  )
+    return "Điểm chỉ được có tối đa 2 chữ số thập phân.";
+  return null;
+}
+
 export function makeIdempotencyKey(prefix: string): string {
   return `${prefix}:${crypto.randomUUID()}`;
 }

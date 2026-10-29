@@ -18,9 +18,11 @@ import {
 } from "../../components/Feedback";
 import { useAuth } from "../../context/AuthContext";
 import { useAsyncData } from "../../hooks/useAsyncData";
+import { makeIdempotencyKey } from "../../lib/domain";
 import { processSubmissionImage } from "../../lib/images";
 import { requireSupabase } from "../../lib/supabase";
-import type { RewardProduct } from "../../types/domain";
+import type { RewardProduct, RewardWish } from "../../types/domain";
+import { TeacherRewardWishes } from "./TeacherRewardWishes";
 
 const blank = {
   name: "",
@@ -34,6 +36,8 @@ export function TeacherRewards() {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<RewardProduct | null>(null);
+  const [selectedWish, setSelectedWish] = useState<RewardWish | null>(null);
+  const [wishRefreshToken, setWishRefreshToken] = useState(0);
   const [form, setForm] = useState(blank);
   const [busy, setBusy] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -46,9 +50,10 @@ export function TeacherRewards() {
     if (error) throw error;
     return (data ?? []) as RewardProduct[];
   }, []);
-  function start(item?: RewardProduct) {
+  function start(item?: RewardProduct, wish?: RewardWish) {
     setImageFile(null);
     setEditing(item ?? null);
+    setSelectedWish(wish ?? null);
     setForm(
       item
         ? {
@@ -59,7 +64,13 @@ export function TeacherRewards() {
             inventory_mode: item.inventory_mode,
             stock_quantity: String(item.stock_quantity ?? 0),
           }
-        : blank,
+        : wish
+          ? {
+              ...blank,
+              name: wish.name,
+              description: wish.description ?? "",
+            }
+          : blank,
     );
     setOpen(true);
   }
@@ -77,6 +88,7 @@ export function TeacherRewards() {
     const db = requireSupabase();
     const recordId = editing?.id ?? crypto.randomUUID();
     let imagePath = editing?.image_path ?? null;
+    let uploadedImagePath: string | null = null;
     if (imageFile) {
       try {
         const processed = await processSubmissionImage(imageFile, 0);
@@ -88,6 +100,7 @@ export function TeacherRewards() {
             upsert: Boolean(editing),
           });
         if (error) throw error;
+        uploadedImagePath = imagePath;
       } catch (reason) {
         setBusy(false);
         return toast.error(
@@ -107,11 +120,35 @@ export function TeacherRewards() {
     };
     const result = editing
       ? await db.from("reward_products").update(payload).eq("id", editing.id)
-      : await db.from("reward_products").insert({ id: recordId, ...payload });
+      : selectedWish
+        ? await db.rpc("create_reward_from_wish", {
+            p_wish_id: selectedWish.id,
+            p_name: payload.name,
+            p_description: payload.description,
+            p_price_points: payload.price_points,
+            p_inventory_mode: payload.inventory_mode,
+            p_stock_quantity: payload.stock_quantity,
+            p_image_path: payload.image_path,
+            p_teacher_comment: "Đã tạo phần thưởng theo mong muốn của em.",
+            p_idempotency_key: makeIdempotencyKey("create-reward-from-wish"),
+          })
+        : await db.from("reward_products").insert({ id: recordId, ...payload });
     setBusy(false);
-    if (result.error) return toast.error(result.error.message);
-    toast.success(editing ? "Đã cập nhật phần quà." : "Đã thêm phần quà.");
+    if (result.error) {
+      if (uploadedImagePath && !editing)
+        await db.storage.from("reward-images").remove([uploadedImagePath]);
+      return toast.error(result.error.message);
+    }
+    toast.success(
+      editing
+        ? "Đã cập nhật phần quà."
+        : selectedWish
+          ? "Đã tạo phần thưởng từ mong muốn của học sinh."
+          : "Đã thêm phần quà.",
+    );
     setOpen(false);
+    setSelectedWish(null);
+    if (selectedWish) setWishRefreshToken((value) => value + 1);
     void state.reload();
   }
   async function seed() {
@@ -156,6 +193,10 @@ export function TeacherRewards() {
           </button>
         </div>
       </header>
+      <TeacherRewardWishes
+        refreshToken={wishRefreshToken}
+        onCreate={(wish) => start(undefined, wish)}
+      />
       <div className="mt-7 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
         {state.data.length === 0 ? (
           <div className="sm:col-span-2 xl:col-span-3">
@@ -220,12 +261,19 @@ export function TeacherRewards() {
           >
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-black">
-                {editing ? "Chỉnh sửa phần quà" : "Thêm phần quà"}
+                {editing
+                  ? "Chỉnh sửa phần quà"
+                  : selectedWish
+                    ? "Tạo quà từ mong muốn"
+                    : "Thêm phần quà"}
               </h2>
               <button
                 type="button"
                 className="btn-ghost min-h-10 p-2"
-                onClick={() => setOpen(false)}
+                onClick={() => {
+                  setOpen(false);
+                  setSelectedWish(null);
+                }}
               >
                 <X />
               </button>
@@ -318,6 +366,7 @@ export function TeacherRewards() {
                 <input
                   type="checkbox"
                   checked={form.active}
+                  disabled={Boolean(selectedWish)}
                   onChange={(e) =>
                     setForm({ ...form, active: e.target.checked })
                   }

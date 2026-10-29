@@ -3,6 +3,9 @@ export type AssignmentStatus = "draft" | "published" | "archived";
 export type SubmissionStatus = "submitted" | "graded" | "approved";
 export type GradingStatus = "draft" | "approved";
 export type RedemptionStatus = "pending" | "delivered" | "cancelled";
+export type AchievementType = "class_score" | "test_score";
+export type AchievementStatus = "pending" | "approved" | "rejected";
+export type RewardWishStatus = "pending" | "created" | "rejected";
 
 export interface Profile {
   id: string;
@@ -83,13 +86,47 @@ export interface PointWallet {
 export interface PointLedgerEntry {
   id: string;
   transaction_type:
-    "assignment_reward" | "manual_reward" | "adjustment" | "reward_redemption";
+    | "assignment_reward"
+    | "achievement_reward"
+    | "manual_reward"
+    | "adjustment"
+    | "reward_redemption";
   source_type: string;
   source_id: string | null;
   delta: number;
   balance_after: number;
   description: string;
   created_at: string;
+}
+
+export interface AchievementFile {
+  id: string;
+  achievement_id: string;
+  storage_path: string;
+  page_order: number;
+  mime_type: string;
+  size_bytes: number;
+  created_at: string;
+}
+
+export interface AchievementSubmission {
+  id: string;
+  student_id: string;
+  achievement_type: AchievementType;
+  subject: string;
+  assessment_name: string;
+  score: number;
+  max_score: number;
+  occurred_on: string;
+  note: string | null;
+  status: AchievementStatus;
+  awarded_points: number;
+  teacher_comment: string | null;
+  reviewed_at: string | null;
+  created_at: string;
+  updated_at: string;
+  achievement_files?: AchievementFile[];
+  profiles?: Pick<Profile, "display_name">;
 }
 
 export interface RewardProduct {
@@ -111,6 +148,21 @@ export interface RewardTarget {
   product_id: string;
   activated_at: string;
   reward_products?: RewardProduct;
+}
+
+export interface RewardWish {
+  id: string;
+  student_id: string;
+  name: string;
+  description: string | null;
+  reference_url: string | null;
+  status: RewardWishStatus;
+  teacher_comment: string | null;
+  reviewed_at: string | null;
+  created_product_id: string | null;
+  created_at: string;
+  updated_at: string;
+  profiles?: Pick<Profile, "display_name">;
 }
 
 export interface RewardRedemption {

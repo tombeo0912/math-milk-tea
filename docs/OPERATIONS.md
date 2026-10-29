@@ -64,7 +64,7 @@ Không restore thử vào production. Auth password hashes/role passwords có gi
 
 ### Ảnh Storage
 
-Database dump chỉ chứa metadata, không chứa object ảnh. Định kỳ tải ba bucket bằng một script/admin client chạy ở máy tin cậy với service-role key truyền qua environment variable. Không ghi key vào lệnh shell history, source hoặc file backup. Giữ cấu trúc đường dẫn object để restore đúng liên kết trong `submission_files`, `assignments` và `reward_products`.
+Database dump chỉ chứa metadata, không chứa object ảnh/PDF. Định kỳ tải bốn bucket bằng một script/admin client chạy ở máy tin cậy với service-role key truyền qua environment variable. Không ghi key vào lệnh shell history, source hoặc file backup. Giữ cấu trúc đường dẫn object để restore đúng liên kết trong `submission_files`, `achievement_files`, `assignments` và `reward_products`.
 
 Quy trình restore Storage:
 

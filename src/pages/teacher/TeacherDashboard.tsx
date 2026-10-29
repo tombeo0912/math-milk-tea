@@ -1,9 +1,11 @@
 import {
+  BadgeCheck,
   BookOpenCheck,
   ClipboardClock,
   Coins,
   Gift,
   GraduationCap,
+  MessageCircleHeart,
   Trophy,
 } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -17,7 +19,7 @@ export function TeacherDashboard() {
   const { profile } = useAuth();
   const state = useAsyncData(async () => {
     const db = requireSupabase();
-    const [a, p, g, w, r, s] = await Promise.all([
+    const [a, p, g, w, r, s, achievements, wishes] = await Promise.all([
       db.from("assignments").select("*", { count: "exact", head: true }),
       db
         .from("submissions")
@@ -37,8 +39,16 @@ export function TeacherDashboard() {
         .select("*", { count: "exact", head: true })
         .eq("status", "pending"),
       db.from("point_ledger").select("delta").gt("delta", 0),
+      db
+        .from("achievement_submissions")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "pending"),
+      db
+        .from("reward_wishes")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "pending"),
     ]);
-    for (const result of [a, p, g, w, r, s])
+    for (const result of [a, p, g, w, r, s, achievements, wishes])
       if (result.error) throw result.error;
     return {
       assignments: a.count ?? 0,
@@ -47,6 +57,8 @@ export function TeacherDashboard() {
       wallet: w.data as unknown as (PointWallet & { profiles: Profile }) | null,
       rewards: r.count ?? 0,
       total: (s.data ?? []).reduce((sum, item) => sum + Number(item.delta), 0),
+      achievements: achievements.count ?? 0,
+      wishes: wishes.count ?? 0,
     };
   }, []);
   if (state.loading) return <LoadingState />;
@@ -71,6 +83,18 @@ export function TeacherDashboard() {
       value: d.graded,
       icon: <Trophy />,
       color: "bg-mint-100 text-mint-500",
+    },
+    {
+      label: "Thành tích chờ duyệt",
+      value: d.achievements,
+      icon: <BadgeCheck />,
+      color: "bg-amber-100 text-amber-700",
+    },
+    {
+      label: "Mong muốn phần thưởng",
+      value: d.wishes,
+      icon: <MessageCircleHeart />,
+      color: "bg-pink-100 text-pink-700",
     },
     {
       label: "Điểm đã thưởng",
@@ -118,7 +142,7 @@ export function TeacherDashboard() {
           </article>
         ))}
       </section>
-      <section className="grid gap-5 lg:grid-cols-3">
+      <section className="grid gap-5 md:grid-cols-2 xl:grid-cols-5">
         <Quick
           to="/giao-vien/bai-tap"
           icon="📝"
@@ -130,6 +154,18 @@ export function TeacherDashboard() {
           icon="✅"
           title="Chấm bài"
           description={`${d.pending} bài đang chờ nhận xét.`}
+        />
+        <Quick
+          to="/giao-vien/duyet-thanh-tich"
+          icon="🏅"
+          title="Duyệt thành tích"
+          description={`${d.achievements} minh chứng đang chờ.`}
+        />
+        <Quick
+          to="/giao-vien/cua-hang"
+          icon="💭"
+          title="Xem mong muốn"
+          description={`${d.wishes} đề nghị phần thưởng mới.`}
         />
         <Quick
           to="/giao-vien/doi-qua"
