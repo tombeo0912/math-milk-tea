@@ -11,11 +11,11 @@ alter table public.point_ledger
     'reward_redemption'
   ));
 
-create unique index point_ledger_one_achievement_reward
+create unique index if not exists point_ledger_one_achievement_reward
   on public.point_ledger(source_id)
   where transaction_type = 'achievement_reward';
 
-create table public.achievement_submissions (
+create table if not exists public.achievement_submissions (
   id uuid primary key default gen_random_uuid(),
   student_id uuid not null references public.profiles(id),
   achievement_type text not null
@@ -77,14 +77,14 @@ create table public.achievement_submissions (
   )
 );
 
-create index achievement_submissions_student_created_idx
+create index if not exists achievement_submissions_student_created_idx
   on public.achievement_submissions(student_id, created_at desc);
 
-create index achievement_submissions_pending_idx
+create index if not exists achievement_submissions_pending_idx
   on public.achievement_submissions(created_at)
   where status = 'pending';
 
-create table public.achievement_files (
+create table if not exists public.achievement_files (
   id uuid primary key default gen_random_uuid(),
   achievement_id uuid not null
     references public.achievement_submissions(id) on delete cascade,
@@ -98,7 +98,7 @@ create table public.achievement_files (
   unique (achievement_id, page_order)
 );
 
-create table public.reward_wishes (
+create table if not exists public.reward_wishes (
   id uuid primary key default gen_random_uuid(),
   student_id uuid not null references public.profiles(id),
   name text not null check (char_length(trim(name)) between 1 and 160),
@@ -144,20 +144,26 @@ create table public.reward_wishes (
   )
 );
 
-create index reward_wishes_student_created_idx
+create index if not exists reward_wishes_student_created_idx
   on public.reward_wishes(student_id, created_at desc);
 
-create index reward_wishes_pending_idx
+create index if not exists reward_wishes_pending_idx
   on public.reward_wishes(created_at)
   where status = 'pending';
 
-create unique index reward_wishes_one_pending_per_student
+create unique index if not exists reward_wishes_one_pending_per_student
   on public.reward_wishes(student_id)
   where status = 'pending';
+
+drop trigger if exists achievement_submissions_touch
+  on public.achievement_submissions;
 
 create trigger achievement_submissions_touch
   before update on public.achievement_submissions
   for each row execute function public.touch_updated_at();
+
+drop trigger if exists reward_wishes_touch
+  on public.reward_wishes;
 
 create trigger reward_wishes_touch
   before update on public.reward_wishes
@@ -175,6 +181,9 @@ grant select on public.achievement_submissions to authenticated;
 grant select on public.achievement_files to authenticated;
 grant select on public.reward_wishes to authenticated;
 
+drop policy if exists achievement_submissions_read
+  on public.achievement_submissions;
+
 create policy achievement_submissions_read
   on public.achievement_submissions
   for select to authenticated
@@ -182,6 +191,9 @@ create policy achievement_submissions_read
     student_id = (select auth.uid())
     or (select public.is_teacher())
   );
+
+drop policy if exists achievement_files_read
+  on public.achievement_files;
 
 create policy achievement_files_read
   on public.achievement_files
@@ -197,6 +209,9 @@ create policy achievement_files_read
         )
     )
   );
+
+drop policy if exists reward_wishes_read
+  on public.reward_wishes;
 
 create policy reward_wishes_read
   on public.reward_wishes
@@ -224,6 +239,9 @@ set public = excluded.public,
     file_size_limit = excluded.file_size_limit,
     allowed_mime_types = excluded.allowed_mime_types;
 
+drop policy if exists achievement_storage_read
+  on storage.objects;
+
 create policy achievement_storage_read
   on storage.objects
   for select to authenticated
@@ -234,6 +252,9 @@ create policy achievement_storage_read
       or (select public.is_teacher())
     )
   );
+
+drop policy if exists achievement_storage_student_upload
+  on storage.objects;
 
 create policy achievement_storage_student_upload
   on storage.objects
@@ -248,6 +269,9 @@ create policy achievement_storage_student_upload
         and role = 'student'
     )
   );
+
+drop policy if exists achievement_storage_cleanup_orphan
+  on storage.objects;
 
 create policy achievement_storage_cleanup_orphan
   on storage.objects
