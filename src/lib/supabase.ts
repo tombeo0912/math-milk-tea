@@ -1,17 +1,18 @@
 import { createClient } from "@supabase/supabase-js";
+import { resolveSupabaseConfiguration } from "./supabase-config";
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL?.trim();
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY?.trim();
+const resolved = resolveSupabaseConfiguration({
+  VITE_SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL,
+  VITE_SUPABASE_PUBLISHABLE_KEY:
+    import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+  VITE_SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY,
+});
 
-export const isSupabaseConfigured = Boolean(
-  supabaseUrl?.startsWith("https://") &&
-  supabaseAnonKey &&
-  !supabaseUrl.includes("your-project") &&
-  !supabaseAnonKey.includes("your-"),
-);
+export const isSupabaseConfigured = resolved.configured;
+export const supabaseConfigurationError = resolved.error;
 
-export const supabase = isSupabaseConfigured
-  ? createClient(supabaseUrl!, supabaseAnonKey!, {
+export const supabase = resolved.configured
+  ? createClient(resolved.config.url, resolved.config.publishableKey, {
       auth: {
         persistSession: true,
         autoRefreshToken: true,
@@ -23,7 +24,8 @@ export const supabase = isSupabaseConfigured
 export function requireSupabase() {
   if (!supabase)
     throw new Error(
-      "Supabase chưa được cấu hình. Hãy thiết lập tệp .env.local trước.",
+      supabaseConfigurationError ??
+        "Supabase chưa được cấu hình. Hãy thiết lập tệp .env.local trước.",
     );
   return supabase;
 }

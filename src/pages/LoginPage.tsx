@@ -9,7 +9,7 @@ import { useState, type FormEvent } from "react";
 import { Navigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from "../context/AuthContext";
-import { supabase } from "../lib/supabase";
+import { supabase, supabaseConfigurationError } from "../lib/supabase";
 import { BrandMark } from "../components/BrandMark";
 
 export function LoginPage() {
@@ -107,8 +107,8 @@ export function LoginPage() {
               <div className="mt-6 break-words rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
                 <strong className="block">Chưa kết nối Supabase</strong>
                 <span>
-                  Thêm VITE_SUPABASE_URL và VITE_SUPABASE_ANON_KEY vào
-                  .env.local, sau đó khởi động lại ứng dụng.
+                  {supabaseConfigurationError ??
+                    "Thêm VITE_SUPABASE_URL và VITE_SUPABASE_PUBLISHABLE_KEY vào .env.local, sau đó khởi động lại ứng dụng."}
                 </span>
               </div>
             )}

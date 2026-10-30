@@ -78,7 +78,7 @@ Quy trình restore Storage:
 
 - Dùng mật khẩu khác email, tối thiểu 10 ký tự; bật MFA cho tài khoản Supabase Dashboard.
 - Không gửi service-role key qua chat/email; rotate ngay nếu lộ.
-- Chỉ publish `VITE_SUPABASE_ANON_KEY`; mọi quyền vẫn phải qua GRANT + RLS.
+- Chỉ publish `VITE_SUPABASE_PUBLISHABLE_KEY`; mọi quyền vẫn phải qua GRANT + RLS. Không bao giờ đưa `sb_secret_...` hoặc service-role key vào frontend.
 - Xem log RPC/Storage khi có lỗi, nhưng không chụp/log access token.
 - Xóa tài khoản phải đi kèm quy trình lưu trữ dữ liệu; không xóa trực tiếp lịch sử điểm.
 - Duy trì project staging riêng hoặc reset local; không thử migrations trên production.

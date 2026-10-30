@@ -54,10 +54,10 @@ Tạo `.env.local`:
 
 ```env
 VITE_SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
-VITE_SUPABASE_ANON_KEY=YOUR_PUBLISHABLE_ANON_KEY
+VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_YOUR_PROJECT_KEY
 ```
 
-Anon/publishable key được phép có trong frontend vì RLS là hàng rào quyền thật. Service-role key tuyệt đối không được đặt ở đây.
+Publishable key được phép có trong frontend vì RLS là hàng rào quyền thật. Tên `VITE_SUPABASE_ANON_KEY` chỉ là fallback cho legacy anon JWT. `sb_secret_...` và service-role key tuyệt đối không được đặt ở đây.
 
 Chạy xác minh local:
 
@@ -80,7 +80,11 @@ Kiểm tra hành trình thật bằng hai cửa sổ trình duyệt riêng:
 7. Học sinh gửi minh chứng điểm tốt; giáo viên duyệt và kiểm tra điểm chỉ cộng một lần.
 8. Học sinh gửi mong muốn quà; giáo viên tạo sản phẩm từ đề nghị và học sinh nhận thông báo.
 
-## 5. Deploy Cloudflare Pages
+## 5. Deploy frontend tĩnh (Sites hoặc Cloudflare Pages)
+
+Với Sites, cấu hình `VITE_SUPABASE_URL` và `VITE_SUPABASE_PUBLISHABLE_KEY` trong Environment variables, sau đó build lại phiên bản production. Vì đây là ứng dụng Vite tĩnh, hai giá trị phải có mặt ngay lúc chạy `npm run build`; chỉ thêm chúng sau khi bundle đã được tạo sẽ không sửa được bundle cũ.
+
+Với Cloudflare Pages:
 
 1. Đưa source lên một GitHub repository **private**. Kiểm tra `.env.local` không nằm trong commit.
 2. Cloudflare Dashboard → Workers & Pages → Create → Pages → Import Git repository.
@@ -88,7 +92,7 @@ Kiểm tra hành trình thật bằng hai cửa sổ trình duyệt riêng:
    - Build command: `npm run build`
    - Build output directory: `dist`
    - Node version: `24`
-4. Thêm hai biến `VITE_SUPABASE_URL` và `VITE_SUPABASE_ANON_KEY` trong phần Environment variables.
+4. Thêm hai biến `VITE_SUPABASE_URL` và `VITE_SUPABASE_PUBLISHABLE_KEY` trong phần Environment variables.
 5. Deploy. Tệp `public/_redirects` đã chứa `/* /index.html 200` để reload React route không lỗi 404.
 6. Lấy URL `https://...pages.dev`, cập nhật Supabase Auth:
    - Site URL: URL production.

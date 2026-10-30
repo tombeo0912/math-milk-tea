@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "verify:env": "node scripts/verify-supabase-env.mjs",
+    "build": "npm run verify:env && tsc -b && vite build",
     "lint": "oxlint",
     "typecheck": "tsc -b --pretty false",
     "test": "vitest run",

@@ -8,7 +8,7 @@ Website học Toán cho một giáo viên và một học sinh: giao bài, nộp
 - Schema PostgreSQL, RLS, private Storage policies và RPC transaction đã có trong `supabase/migrations`.
 - Unit test nghiệp vụ frontend bao phủ công thức điểm, tệp PDF/ảnh và điểm số do học sinh báo cáo.
 - Database test pgTAP đã viết trong `supabase/tests/database`.
-- Chưa thể xác minh end-to-end với Supabase production cho đến khi có project URL, anon key và hai tài khoản thật. Ứng dụng không dùng dữ liệu giả để che trạng thái này.
+- Build production tự kiểm tra project URL và publishable key; ứng dụng không dùng dữ liệu giả để che trạng thái mất kết nối.
 
 ## Chức năng chính
 
@@ -64,10 +64,10 @@ npm run dev
 
 ```env
 VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-publishable-anon-key
+VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_your-project-key
 ```
 
-Không đặt service-role key trong frontend hoặc tệp `.env.local` của Vite.
+Tên cũ `VITE_SUPABASE_ANON_KEY` vẫn được hỗ trợ tạm thời cho legacy anon JWT. Không đặt `sb_secret_...` hoặc service-role key trong frontend hay tệp `.env.local` của Vite.
 
 ## Lệnh kiểm tra
 
